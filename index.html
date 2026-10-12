@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Monkey Mind: Matter Mission</title>
+<style>
+:root{--ink:#17352d;--green:#36b95b;--deep:#167341;--lime:#d9ff72;--gold:#ffd34e;--cream:#fff8df;--sky:#b9eaff;--red:#ff6c69;--purple:#8065dc;--card:#fffdf3}
+*{box-sizing:border-box} body{margin:0;font-family:ui-rounded,"Trebuchet MS",system-ui,sans-serif;color:var(--ink);background:linear-gradient(#a9e5ff 0 32%,#d7f4a1 32% 100%);min-height:100vh}
+button{font:inherit;cursor:pointer;touch-action:manipulation} button:focus-visible{outline:4px solid #ffb000;outline-offset:3px}
+.game{max-width:1100px;margin:auto;padding:16px 16px 28px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}.logo{width:58px;height:58px;border-radius:18px;background:#fff;border:3px solid #276d48;display:grid;place-items:center;font-size:34px;box-shadow:0 5px 0 #276d48}
+h1{font-size:clamp(1.35rem,3vw,2rem);margin:0;font-weight:1000;letter-spacing:-.5px}.subtitle{margin:2px 0 0;font-weight:700;color:#3b6554;font-size:.9rem}
+.stats{display:flex;gap:8px;flex-wrap:wrap}.stat{background:#fffdf1;border:2px solid #37764e;border-radius:14px;padding:8px 12px;box-shadow:0 3px 0 #37764e;font-weight:900;white-space:nowrap}.stat span{color:#a66b00}
+.scene{margin-top:16px;border:3px solid #276d48;border-radius:24px;overflow:hidden;background:linear-gradient(#8edaff 0 54%,#7bd66a 54% 100%);box-shadow:0 7px 0 #276d48;position:relative}
+.scenetop{padding:18px 20px 4px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.leveltag{display:inline-block;background:#fff8d8;border:2px solid #276d48;border-radius:999px;padding:7px 13px;font-weight:1000}
+.mission{font-size:clamp(1.1rem,2.5vw,1.55rem);font-weight:1000;margin:10px 0 0}
+.map{height:148px;position:relative;overflow:hidden;margin:0 12px}
+.path{position:absolute;left:-5%;right:-5%;top:38px;height:84px;border:23px solid #d8b67a;border-radius:55px;transform:rotate(-4deg);box-shadow:inset 0 0 0 3px #ad874d}
+.path:after{content:"";position:absolute;inset:0;border:3px dashed #fff0bd;border-radius:40px}
+.tower{position:absolute;z-index:2;bottom:14px;left:16%;font-size:56px;filter:drop-shadow(0 3px 0 #22613e);animation:bob 2s ease-in-out infinite}
+.monkey{position:absolute;z-index:3;bottom:14px;left:calc(16% + 55px);font-size:48px;animation:bob 1.6s ease-in-out infinite}
+.balloon{position:absolute;right:16%;top:18px;font-size:40px;animation:float 2.5s ease-in-out infinite}
+.flag{position:absolute;right:7%;bottom:19px;font-size:36px}
+@keyframes bob{50%{transform:translateY(-5px)}}@keyframes float{50%{transform:translateY(-9px)}}
+.progresswrap{padding:0 20px 16px}.progresslabel{display:flex;justify-content:space-between;font-size:.85rem;font-weight:900;margin-bottom:6px}.progress{height:14px;border:2px solid #276d48;background:#f9fff1;border-radius:20px;overflow:hidden}.progressbar{height:100%;width:0;background:linear-gradient(90deg,#9df23d,#28b956);transition:width .3s}
+.panel{margin-top:18px;background:var(--cream);border:3px solid #276d48;border-radius:24px;padding:clamp(15px,3vw,25px);box-shadow:0 6px 0 #276d48}
+.promptrow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.eyebrow{font-size:.78rem;font-weight:1000;letter-spacing:1.2px;text-transform:uppercase;color:#538067}.word{font-size:clamp(1.65rem,4vw,2.5rem);font-weight:1000;margin:5px 0 0;letter-spacing:-.8px}.instruction{margin:7px 0 16px;color:#4d6a5c;font-weight:700}
+.badge{border-radius:13px;background:#fff;border:2px solid #d8e5bd;padding:8px 11px;font-weight:900;color:#52704f}
+.answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.answer{min-height:88px;text-align:left;border:3px solid #a4c98b;border-radius:17px;background:white;padding:15px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 0 #a4c98b;color:var(--ink);font-weight:750;line-height:1.35;transition:transform .12s,border-color .12s,background .12s}
+.answer:hover{transform:translateY(-2px);border-color:#43a95a}.answer .letter{flex:0 0 34px;height:34px;display:grid;place-items:center;background:#e9f8d9;border-radius:10px;font-weight:1000;color:#357a44}
+.answer.correct{background:#e1ffd9;border-color:#2eb45b;box-shadow:0 4px 0 #2b914b}.answer.wrong{background:#ffe4df;border-color:#ee6860;box-shadow:0 4px 0 #ce514b;animation:shake .22s}
+.answer:disabled{cursor:default;opacity:.96}@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.feedback{margin-top:14px;border-radius:14px;padding:12px 14px;font-weight:850;display:none;line-height:1.4}.feedback.show{display:block}.feedback.good{background:#dff9d6;border:2px solid #51bd65}.feedback.try{background:#ffe8d8;border:2px solid #f0a45e}
+.actions{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-top:16px}.smallnote{font-size:.83rem;color:#607766;font-weight:700}.primary,.secondary{border:0;border-radius:14px;padding:12px 18px;font-weight:1000}.primary{background:var(--gold);color:#503600;box-shadow:0 4px 0 #c38c17}.primary:hover{filter:brightness(1.04);transform:translateY(-1px)}.primary:disabled{opacity:.45;cursor:not-allowed;transform:none}.secondary{background:#e4f1dc;color:#285b3a;border:2px solid #9ac38b}
+.hidden{display:none!important}.intro,.complete{text-align:center;padding:10px 4px}.heroemoji{font-size:68px;line-height:1.1}.intro h2,.complete h2{font-size:clamp(1.5rem,4vw,2.2rem);margin:10px 0}.intro p,.complete p{max-width:650px;margin:8px auto 18px;line-height:1.55;color:#456454;font-weight:700}.howto{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:18px 0}.howto div{background:white;border:2px solid #d4e7c5;border-radius:14px;padding:10px 12px;font-weight:850}.levelchoices{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:18px 0}.levelchip{background:#fff;border:2px solid #9ac38b;border-radius:14px;padding:10px 13px;font-weight:900}.levelchip.active{background:#e0ffd4;border-color:#35a650}
+.coins-pop{position:fixed;z-index:20;pointer-events:none;font-size:24px;font-weight:1000;color:#a66b00;text-shadow:0 1px white;animation:pop .85s ease-out forwards}@keyframes pop{to{transform:translateY(-70px) scale(1.3);opacity:0}}
+.footer{text-align:center;margin-top:17px;font-size:.78rem;color:#4b7058;font-weight:750}
+@media(max-width:620px){.game{padding:10px 10px 22px}.logo{width:48px;height:48px;font-size:29px}.stats{width:100%;display:grid;grid-template-columns:repeat(3,1fr)}.stat{text-align:center;padding:7px 4px;font-size:.88rem}.scene{margin-top:12px}.map{height:115px}.path{top:28px;height:68px;border-width:18px}.tower{font-size:45px;bottom:10px}.monkey{font-size:38px;bottom:10px;left:calc(16% + 43px)}.balloon{font-size:34px}.flag{font-size:30px}.answers{grid-template-columns:1fr;gap:10px}.answer{min-height:72px;padding:12px}.panel{margin-top:14px}.actions .primary{flex:1}.smallnote{width:100%;order:2}}
+@media(min-width:621px){.answer{min-height:100px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="game">
+<header class="topbar">
+  <div class="brand"><div class="logo" aria-hidden="true">🐵</div><div><h1>Monkey Mind: Matter Mission</h1><p class="subtitle">A science adventure • Learn, earn, level up!</p></div></div>
+  <div class="stats" aria-label="Game statistics"><div class="stat">🪙 Coins: <span id="coins">0</span></div><div class="stat">🔥 Streak: <span id="streak">0</span></div><div class="stat">⭐ Best: <span id="best">0</span></div></div>
+</header>
+
+<section class="scene" aria-label="Adventure map">
+  <div class="scenetop"><div><span class="leveltag" id="leveltag">LEVEL 1 • WARM-UP</span><p class="mission" id="mission">Help the monkey defend the Science Trail!</p></div><span class="leveltag" id="roundcount">Question 1 of 6</span></div>
+  <div class="map"><div class="path"></div><div class="tower" id="tower">🎯</div><div class="monkey">🐵</div><div class="balloon" id="balloon">🎈</div><div class="flag">🏁</div></div>
+  <div class="progresswrap"><div class="progresslabel"><span>Trail progress</span><span id="progressText">0%</span></div><div class="progress"><div class="progressbar" id="progressbar"></div></div></div>
+</section>
+
+<section class="panel" id="intro">
+  <div class="intro"><div class="heroemoji">🐵🎈</div><h2>Ready for the Matter Mission?</h2><p>Match each science word to its meaning. Every correct answer earns coins to power up your monkey's tower. Clear all three levels to become a Matter Master!</p>
+  <div class="howto"><div>🧠 Think it through</div><div>🪙 Earn coins</div><div>🎯 Pop balloons</div><div>🏆 Beat all 3 levels</div></div>
+  <div class="levelchoices" aria-label="Choose starting level"><button class="levelchip active" data-start="0">Level 1 · Easy</button><button class="levelchip" data-start="1">Level 2 · Tricky</button><button class="levelchip" data-start="2">Level 3 · Boss</button></div>
+  <button class="primary" id="startBtn">Start the mission! 🚀</button></div>
+</section>
+
+<section class="panel hidden" id="quiz" aria-live="polite">
+  <div class="promptrow"><div><div class="eyebrow">Find the matching definition</div><div class="word" id="word">Matter</div></div><span class="badge" id="difficulty">🟢 2 choices</span></div>
+  <p class="instruction" id="instruction">Which answer matches this word?</p>
+  <div class="answers" id="answers"></div>
+  <div class="feedback" id="feedback" role="status"></div>
+  <div class="actions"><span class="smallnote" id="hint">Tip: Matter is all around you!</span><button class="primary" id="nextBtn" disabled>Next question ➜</button></div>
+</section>
+
+<section class="panel hidden" id="complete">
+ <div class="complete"><div class="heroemoji" id="completeEmoji">🏆🐵</div><h2 id="completeTitle">Level cleared!</h2><p id="completeText">Great work!</p><div class="howto"><div>🪙 Total coins: <strong id="finalCoins">0</strong></div><div>🔥 Best streak: <strong id="finalStreak">0</strong></div></div><button class="primary" id="continueBtn">Next level ➜</button> <button class="secondary" id="replayBtn">Play again ↻</button></div>
+</section>
+<div class="footer">Made for curious minds • Works on touchscreens and computers • Your progress lasts while this page stays open</div>
+</div>
+<script>
+const cards = [
+ {word:"Matter",def:"Everything that has mass and takes up space.",hint:"You, water, air, and your desk are all matter."},
+ {word:"Mass",def:"The amount of matter in an object.",hint:"Mass tells how much matter is in something."},
+ {word:"Solid",def:"Matter that has its own shape and volume.",hint:"Think of an ice cube or a toy block."},
+ {word:"Liquid",def:"Matter that flows and takes the shape of its container.",hint:"Water in a cup is a liquid."},
+ {word:"Gas",def:"Matter with no definite shape or volume.",hint:"Air is a gas and spreads out to fill space."},
+ {word:"Freezing Point",def:"The temperature at which a liquid changes into a solid.",hint:"Water freezes into ice at 0°C (32°F)."},
+ {word:"Melting Point",def:"The temperature at which a solid changes into a liquid.",hint:"Ice melts into liquid water."},
+ {word:"Condensation",def:"When a gas changes into a liquid.",hint:"Tiny water drops on a cold glass are an example."},
+ {word:"Evaporation",def:"When a liquid changes into a gas.",hint:"A puddle drying in the sun is an example."},
+ {word:"Physical Change",def:"A change in size, shape, or form; no new substance is made.",hint:"Cutting paper changes its shape, not what it is made of."},
+ {word:"Chemical Change",def:"A change that forms a different substance.",hint:"Rust forming on iron is a chemical change."},
+ {word:"Volume",def:"The amount of space matter takes up.",hint:"A balloon takes up space, so it has volume."}
+];
+const $=id=>document.getElementById(id);
+let level=0,coins=0,streak=0,best=0,index=0,roundCards=[],answered=false,selectedStart=0,levelCoins=0,levelBest=0,completedLevels=[];
+const levels=[
+ {name:"WARM-UP",title:"Easy Trail",count:6,choices:2,reward:10,desc:"Two choices at a time. You've got this!",tower:"🎯",balloon:"🎈"},
+ {name:"JUNGLE JUMBLE",title:"Tricky Trail",count:8,choices:4,reward:20,desc:"More definitions are joining the adventure!",tower:"🏹",balloon:"🎈🎈"},
+ {name:"MATTER BOSS",title:"Boss Balloon Round",count:12,choices:6,reward:30,desc:"The full vocabulary challenge. Show what you know!",tower:"🚀",balloon:"🎈🎈🎈"}
+];
+function shuffle(a){let x=[...a];for(let i=x.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]]}return x}
+function setLevelChoice(n){selectedStart=n;document.querySelectorAll(".levelchip").forEach(b=>b.classList.toggle("active",+b.dataset.start===n))}
+document.querySelectorAll(".levelchip").forEach(b=>b.addEventListener("click",()=>setLevelChoice(+b.dataset.start)));
+function beginLevel(n){
+ level=n;index=0;streak=0;levelCoins=0;levelBest=0;answered=false;
+ const needed=n===0?6:n===1?8:12;
+ roundCards=shuffle(cards).slice(0,needed);
+ $("intro").classList.add("hidden");$("complete").classList.add("hidden");$("quiz").classList.remove("hidden");
+ $("leveltag").textContent=`LEVEL ${n+1} • ${levels[n].name}`;$("mission").textContent=levels[n].desc;
+ $("tower").textContent=levels[n].tower;$("balloon").textContent=levels[n].balloon;
+ renderQuestion();
+}
+function renderQuestion(){
+ answered=false;const c=roundCards[index],cfg=levels[level];
+ $("word").textContent=c.word;$("difficulty").textContent=["🟢 2 choices","🟡 4 choices","🔴 6 choices"][level];
+ $("instruction").textContent=["Pick the definition that matches this word.","Look carefully — four definitions, one match!","Boss round! Can you spot the right definition?"][level];
+ $("roundcount").textContent=`Question ${index+1} of ${roundCards.length}`;
+ $("progressText").textContent=Math.round(index/roundCards.length*100)+"%";$("progressbar").style.width=(index/roundCards.length*100)+"%";
+ $("feedback").className="feedback";$("feedback").textContent="";$("nextBtn").disabled=true;$("nextBtn").textContent=index===roundCards.length-1?"Finish level 🏆":"Next question ➜";
+ let wrong=shuffle(cards.filter(x=>x.word!==c.word)).slice(0,cfg.choices-1);
+ let options=shuffle([c,...wrong]);
+ $("answers").innerHTML="";
+ options.forEach((o,i)=>{const b=document.createElement("button");b.className="answer";b.innerHTML=`<span class="letter">${String.fromCharCode(65+i)}</span><span>${o.def}</span>`;b.addEventListener("click",()=>choose(b,o,c));$("answers").appendChild(b)});
+ $("hint").textContent=level===0?"Tip: Read both choices carefully.":level===1?"Tip: Think of a real-life example.":"Tip: Say the word in your head, then check what it means.";
+}
+function choose(btn,option,correct){
+ if(answered)return;answered=true;document.querySelectorAll(".answer").forEach(b=>b.disabled=true);
+ const fb=$("feedback");
+ if(option.word===correct.word){
+  btn.classList.add("correct");streak++;best=Math.max(best,streak);levelBest=Math.max(levelBest,streak);
+  const reward=levels[level].reward+(streak>=3?5:0);coins+=reward;levelCoins+=reward;
+  $("coins").textContent=coins;$("streak").textContent=streak;$("best").textContent=best;
+  fb.className="feedback show good";fb.textContent=`🎯 POP! That's right! +${reward} coins${streak>=3?" (5-coin streak bonus!)":""} ${streak>=3?"🔥":""}`;
+  $("tower").textContent=streak>=5?"🚀":levels[level].tower;$("balloon").textContent="💥";
+  popCoins(btn,`+${reward} 🪙`);
+ }else{
+  btn.classList.add("wrong");streak=0;$("streak").textContent=streak;
+  const right=[...document.querySelectorAll(".answer")].find(b=>b.textContent.includes(correct.def));if(right)right.classList.add("correct");
+  fb.className="feedback show try";fb.textContent=`Almost! The match is “${correct.def}” Remember: ${correct.hint}`;
+ }
+ $("nextBtn").disabled=false;
+}
+function popCoins(el,text){const r=el.getBoundingClientRect(),p=document.createElement("div");p.className="coins-pop";p.textContent=text;p.style.left=(r.left+r.width/2)+"px";p.style.top=(r.top+10)+"px";document.body.appendChild(p);setTimeout(()=>p.remove(),900)}
+function nextQuestion(){
+ if(!answered)return;
+ index++;
+ if(index>=roundCards.length){$("progressText").textContent="100%";$("progressbar").style.width="100%";showComplete();}else{$("balloon").textContent=levels[level].balloon;renderQuestion()}
+}
+function showComplete(){
+ $("quiz").classList.add("hidden");$("complete").classList.remove("hidden");completedLevels[level]=true;
+ $("completeEmoji").textContent=level===2?"🏆🐵🎉":"🎉🐵⭐";
+ $("completeTitle").textContent=level===2?"MATTER MASTER!":"Level cleared!";
+ $("completeText").textContent=level===2?`You beat the Matter Boss and matched all the science words! You earned ${levelCoins} coins this level. You're ready for your test!`:`Awesome job! You earned ${levelCoins} coins this level. ${level===0?"The next trail has more choices — you're leveling up!":"The final boss has the whole vocabulary set waiting for you!"}`;
+ $("finalCoins").textContent=coins;$("finalStreak").textContent=best;
+ $("continueBtn").textContent=level===2?"Mission complete! Play again ↻":"Unlock Level "+(level+2)+" ➜";
+ $("continueBtn").style.display=level===2?"none":"inline-block";
+}
+$("startBtn").addEventListener("click",()=>{coins=0;best=0;completedLevels=[];$("coins").textContent=0;$("best").textContent=0;beginLevel(selectedStart)});
+$("nextBtn").addEventListener("click",nextQuestion);
+$("continueBtn").addEventListener("click",()=>{if(level<2)beginLevel(level+1)});
+$("replayBtn").addEventListener("click",()=>{setLevelChoice(0);$("complete").classList.add("hidden");$("intro").classList.remove("hidden");$("quiz").classList.add("hidden");$("mission").textContent="Help the monkey defend the Science Trail!";$("leveltag").textContent="LEVEL 1 • WARM-UP";$("roundcount").textContent="Ready when you are";$("progressText").textContent="0%";$("progressbar").style.width="0%";$("tower").textContent="🎯";$("balloon").textContent="🎈";$("streak").textContent="0"});
+</script>
+</body>
+</html>
